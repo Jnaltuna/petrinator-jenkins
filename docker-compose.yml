@@ -1,0 +1,55 @@
+version: "3.9"
+services: 
+    docker:
+        build: ./dind-cert/
+        privileged: true
+        environment:
+            - DOCKER_TLS_CERTDIR=/certs
+        ports: 
+            - 2376:2376
+            - 3000:3000
+        networks:
+            - backend
+        volumes:
+            - jenkins-docker-certs:/certs/client
+            - jenkins-data:/var/jenkins_home
+
+    jenk-blue:
+        build: ./jenkins-blue
+        environment:
+            - DOCKER_HOST=tcp://docker:2376
+            - DOCKER_CERT_PATH=/certs/client
+            - DOCKER_TLS_VERIFY=1
+        ports:
+            - 8080:8080
+            - 50000:50000
+        networks:
+            - backend    
+        volumes:
+            - jenkins-data:/var/jenkins_home
+            - jenkins-docker-certs:/certs/client:ro
+            - ${HOME}:/home
+    registry:
+        image: registry:2
+        ports: 
+            - 5000:5000
+        networks:
+            - backend
+
+    archiva:
+        image: xetusoss/archiva
+        ports: 
+            - 8090:8080
+        networks: 
+            - backend
+        volumes:
+            - archiva-data-vol:/archiva-data
+    
+networks:
+    backend:
+        driver: bridge
+
+volumes:
+    archiva-data-vol:
+    jenkins-data:
+    jenkins-docker-certs:

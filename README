@@ -1,0 +1,9 @@
+# Jenkins pipeline for Petrinator
+
+Jenkins docker image to create the pipeline
+
+Archiva docker image to publish jar files
+
+Local docker registry to upload custom maven file used by Jenkins
+
+Custom maven file with authentication for the archiva repository

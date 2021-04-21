@@ -1,0 +1,25 @@
+pipeline {
+    agent {
+        docker {
+            image 'registry:5000/maven-conf'
+            args '-v /root/.m2:/root/.m2 --network host'
+            alwaysPull true
+        }
+    }
+    options {
+        skipStagesAfterUnstable()
+    }
+    stages {
+        stage('Build') {
+            steps {
+                sh 'mvn -B -DskipTests clean package'
+            }
+        }
+        stage('Deliver') {
+            steps {
+                //sh 'mvn deploy:deploy-file -Dfile=target/java_petri_engine-1.0.jar -Durl=http://archiva:8080/repository/internal'
+                sh 'mvn deploy'
+            }
+        }
+    }
+}
